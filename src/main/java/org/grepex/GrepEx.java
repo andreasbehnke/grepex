@@ -6,8 +6,12 @@ import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
+
 public class GrepEx {
 
+	private static final int CONTEXT_LINE_COUNT = 10;
+	
 	private enum State {
 		searchingException,
 		processingException
@@ -17,9 +21,9 @@ public class GrepEx {
 	
 	private static int linenumber = 1;
 	
-	private static int currentExecptionLineNumber;
+	private static CircularFifoBuffer lineBuffer = new CircularFifoBuffer(CONTEXT_LINE_COUNT);
 	
-	private static String firstExceptionLine;
+	private static String currentExceptionContext;
 	
 	private static StringBuilder currentExceptionStack;
 	
@@ -29,6 +33,7 @@ public class GrepEx {
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 		String line;
 		while ((line = input.readLine()) != null) {
+			lineBuffer.add(line);
 			processLine(line);
 			linenumber++;
 		}
@@ -38,8 +43,11 @@ public class GrepEx {
 		switch (state) {
 		case searchingException:
 			if (line.contains("Exception")) {
-				currentExecptionLineNumber = linenumber;
-				firstExceptionLine = line;
+				StringBuilder firstExceptionLines = new StringBuilder(String.format("\n*****\nFound exception at line %s:", linenumber));
+				for (Object contextLine : lineBuffer) {
+					firstExceptionLines.append(System.lineSeparator()).append(contextLine);
+				}
+				currentExceptionContext = firstExceptionLines.toString();
 				currentExceptionStack = new StringBuilder();
 				state = State.processingException;
 			}
@@ -53,8 +61,7 @@ public class GrepEx {
 				// end of exception
 				String exceptionStackTrace = currentExceptionStack.toString();
 				if (exceptionStacks.add(exceptionStackTrace)) {
-					System.out.println(String.format("\n*****\nFound exception at line %s:", currentExecptionLineNumber));
-					System.out.println(firstExceptionLine);
+					System.out.println(currentExceptionContext);
 					System.out.println(exceptionStackTrace);
 				}
 				state = State.searchingException;
