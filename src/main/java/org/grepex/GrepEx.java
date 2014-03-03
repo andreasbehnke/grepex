@@ -37,6 +37,10 @@ public class GrepEx {
 			processLine(line);
 			linenumber++;
 		}
+		System.out.println();
+		System.out.println("*****");
+		System.out.println("Summary:");
+		System.out.println(String.format("Found %s unique exception stacktraces in input stream", exceptionStacks.size()));
 	}
 
 	private static void processLine(String line) {
