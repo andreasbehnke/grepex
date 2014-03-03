@@ -13,3 +13,4 @@
 # Maven build
 target/
 
+/build
