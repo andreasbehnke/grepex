@@ -32,8 +32,15 @@ public class ExceptionData {
 	public int getNumberOfOccurrence() {
 		return numberOfOccurrence;
 	}
-	
+
 	public void incrementNumberOfOccurrence() {
 		numberOfOccurrence++;
+	}
+
+	public void dump(boolean displayNumberOfOccurrences) {
+		System.out.println(StandardOptions.SEPARATOR);
+		System.out.println(String.format("Found exception with first occurrence at line %s:", lineNumberOfFirstOccurrence));
+		System.out.println(contextLogs);
+		System.out.println(stacktrace);
 	}
 }

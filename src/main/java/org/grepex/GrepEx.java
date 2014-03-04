@@ -23,6 +23,8 @@ public class GrepEx {
 	
 	private static CircularFifoBuffer lineBuffer = new CircularFifoBuffer(CONTEXT_LINE_COUNT);
 	
+	private static int currentExceptionLineNumber;
+	
 	private static String currentExceptionContext;
 	
 	private static StringBuilder currentExceptionStack;
@@ -38,7 +40,7 @@ public class GrepEx {
 			linenumber++;
 		}
 		System.out.println();
-		System.out.println("*****");
+		System.out.println(StandardOptions.SEPARATOR);
 		System.out.println("Summary:");
 		System.out.println(String.format("Found %s unique exception stacktraces in input stream", exceptionMap.size()));
 	}
@@ -47,7 +49,8 @@ public class GrepEx {
 		switch (state) {
 		case searchingException:
 			if (line.contains("Exception")) {
-				StringBuilder firstExceptionLines = new StringBuilder(String.format("\n*****\nFound exception at line %s:", linenumber));
+				currentExceptionLineNumber = linenumber;
+				StringBuilder firstExceptionLines = new StringBuilder();
 				for (Object contextLine : lineBuffer) {
 					firstExceptionLines.append(System.lineSeparator()).append(contextLine);
 				}
@@ -65,9 +68,9 @@ public class GrepEx {
 				// end of exception
 				String exceptionStackTrace = currentExceptionStack.toString();
 				if (!exceptionMap.containsKey(exceptionStackTrace)) {
-					exceptionMap.put(exceptionStackTrace, new ExceptionData(exceptionStackTrace, currentExceptionContext, linenumber));
-					System.out.println(currentExceptionContext);
-					System.out.println(exceptionStackTrace);
+					ExceptionData exceptionData = new ExceptionData(exceptionStackTrace, currentExceptionContext, currentExceptionLineNumber);
+					exceptionMap.put(exceptionStackTrace, exceptionData);
+					exceptionData.dump(false);
 				}
 				state = State.searchingException;
 			}
