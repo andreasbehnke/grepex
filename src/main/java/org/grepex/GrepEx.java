@@ -3,8 +3,8 @@ package org.grepex;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 
@@ -27,7 +27,7 @@ public class GrepEx {
 	
 	private static StringBuilder currentExceptionStack;
 	
-	private static final Set<String> exceptionStacks = new HashSet<>();
+	private static final Map<String, ExceptionData> exceptionMap = new HashMap<>();
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
@@ -40,7 +40,7 @@ public class GrepEx {
 		System.out.println();
 		System.out.println("*****");
 		System.out.println("Summary:");
-		System.out.println(String.format("Found %s unique exception stacktraces in input stream", exceptionStacks.size()));
+		System.out.println(String.format("Found %s unique exception stacktraces in input stream", exceptionMap.size()));
 	}
 
 	private static void processLine(String line) {
@@ -64,7 +64,8 @@ public class GrepEx {
 			} else {
 				// end of exception
 				String exceptionStackTrace = currentExceptionStack.toString();
-				if (exceptionStacks.add(exceptionStackTrace)) {
+				if (!exceptionMap.containsKey(exceptionStackTrace)) {
+					exceptionMap.put(exceptionStackTrace, new ExceptionData(exceptionStackTrace, currentExceptionContext, linenumber));
 					System.out.println(currentExceptionContext);
 					System.out.println(exceptionStackTrace);
 				}
