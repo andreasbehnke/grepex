@@ -39,7 +39,11 @@ public class ExceptionData {
 
 	public void dump(boolean displayNumberOfOccurrences) {
 		System.out.println(StandardOptions.SEPARATOR);
-		System.out.println(String.format("Found exception with first occurrence at line %s:", lineNumberOfFirstOccurrence));
+		if (displayNumberOfOccurrences) {
+			System.out.println(String.format("Found exception %s times with first occurrence at line %s:", numberOfOccurrence, lineNumberOfFirstOccurrence));
+		} else {
+			System.out.println(String.format("Found exception with first occurrence at line %s:", lineNumberOfFirstOccurrence));
+		}
 		System.out.println(contextLogs);
 		System.out.println(stacktrace);
 	}
