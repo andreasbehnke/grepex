@@ -6,14 +6,18 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
+import org.apache.commons.lang3.StringUtils;
 
 public class GrepEx {
 
 	private static final int CONTEXT_LINE_COUNT = 10;
+	
+	private static final int LEVENSTEIN_THRESHOLD = 250;
+	
+	private static final float DISTANCE_THRESHOLD = 0.2f;
 	
 	private static final String HELP = "grepex [-s|--summary] [-h|--help]" + System.lineSeparator()
 			+ "\t-s --summary: Print all unique exceptions after processing input ordered by number of occurrences." + System.lineSeparator()
@@ -46,7 +50,7 @@ public class GrepEx {
 	
 	private static StringBuilder currentExceptionStack;
 	
-	private static final Map<String, ExceptionData> exceptionMap = new HashMap<>();
+	private static final List<ExceptionData> exceptions = new ArrayList<>();
 
 	public static void main(String[] args) throws IOException {
 		if (args.length > 0) {
@@ -69,7 +73,7 @@ public class GrepEx {
 		System.out.println();
 		System.out.println(StandardOptions.SEPARATOR);
 		System.out.println("Summary:");
-		System.out.println(String.format("Found %s unique exception stacktraces in input stream:", exceptionMap.size()));
+		System.out.println(String.format("Found %s unique exception stacktraces in input stream.", exceptions.size()));
 		if (displaySummary) {
 			displaySummary();
 		}
@@ -97,15 +101,17 @@ public class GrepEx {
 			} else {
 				// end of exception
 				String exceptionStackTrace = currentExceptionStack.toString();
-				ExceptionData exceptionData = exceptionMap.get(exceptionStackTrace);
-				if (exceptionData == null) {
-					exceptionData = new ExceptionData(exceptionStackTrace, currentExceptionContext, currentExceptionLineNumber);
-					exceptionMap.put(exceptionStackTrace, exceptionData);
-					if (!displaySummary) {
-						exceptionData.dump(false);
+				if (!StringUtils.isEmpty(exceptionStackTrace.trim())) {
+					ExceptionData exceptionData = findMatchingException(exceptionStackTrace);
+					if (exceptionData == null) {
+						exceptionData = new ExceptionData(exceptionStackTrace, currentExceptionContext, currentExceptionLineNumber);
+						exceptions.add(exceptionData);
+						if (!displaySummary) {
+							exceptionData.dump(false);
+						}
+					} else {
+						exceptionData.incrementNumberOfOccurrence();
 					}
-				} else {
-					exceptionData.incrementNumberOfOccurrence();
 				}
 				state = State.searchingException;
 			}
@@ -115,8 +121,27 @@ public class GrepEx {
 		}
 	}
 	
+	private static ExceptionData findMatchingException(String currentStackTrace) {
+		// calculating similarity using levenstein distance measurement
+		for (ExceptionData exceptionData : exceptions) {
+			String stackTrace = exceptionData.getStacktrace();
+			if (currentStackTrace.equals(stackTrace)) {
+				return exceptionData;
+			}
+			int levenstein = StringUtils.getLevenshteinDistance(stackTrace, currentStackTrace, LEVENSTEIN_THRESHOLD);
+			if (levenstein > 0) {
+				float distance = (float)levenstein / (float)Math.max(stackTrace.length(), currentStackTrace.length());
+				if (distance < DISTANCE_THRESHOLD) {
+					return exceptionData;
+				}
+			}
+			
+		}
+		return null;
+	}
+	
 	private static void displaySummary() {
-		ArrayList<ExceptionData> exceptionsDataList = new ArrayList<>(exceptionMap.values());
+		ArrayList<ExceptionData> exceptionsDataList = new ArrayList<>(exceptions);
 		Collections.sort(exceptionsDataList, new Comparator<ExceptionData>() {
 			@Override
 			public int compare(ExceptionData o1, ExceptionData o2) {
