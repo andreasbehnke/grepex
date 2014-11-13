@@ -2,7 +2,7 @@ package org.grepex;
 
 public class ExceptionData {
 
-	private final String stacktrace;
+	private final Stacktrace stacktrace;
 	
 	private final String contextLogs;
 	
@@ -10,14 +10,14 @@ public class ExceptionData {
 	                                   
 	private int numberOfOccurrence;
 
-	public ExceptionData(String stacktrace, String contextLogs, int lineNumberOfFirstOccurrence) {
+	public ExceptionData(Stacktrace stacktrace, String contextLogs, int lineNumberOfFirstOccurrence) {
 		this.stacktrace = stacktrace;
 		this.contextLogs = contextLogs;
 		this.lineNumberOfFirstOccurrence = lineNumberOfFirstOccurrence;
 		this.numberOfOccurrence = 1;
 	}
 
-	public String getStacktrace() {
+	public Stacktrace getStacktrace() {
 		return stacktrace;
 	}
 
@@ -45,6 +45,8 @@ public class ExceptionData {
 			System.out.println(String.format("Found exception with first occurrence at line %s:", lineNumberOfFirstOccurrence));
 		}
 		System.out.println(contextLogs);
-		System.out.println(stacktrace);
+		for (String line : stacktrace.getLines()) {
+			System.out.println(line);
+		}
 	}
 }
