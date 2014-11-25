@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 
 public class GrepEx {
@@ -16,19 +17,7 @@ public class GrepEx {
 	
 	private static final int DIFFERENT_STACKTRACE_LINES_THRESHOLD = 3;
 	
-	private static final String HELP = "grepex [-s|--summary] [-h|--help]" + System.lineSeparator()
-			+ "\t-s --summary: Print all unique exceptions after processing input ordered by number of occurrences." + System.lineSeparator()
-			+ "\t-h --help: print this help message";
-	
-	private static final String SUMMARY_OPTION_SHORT = "-s";
-	
-	private static final String SUMMARY_OPTION_LONG = "--summary";
-	
-	private static final String HELP_OPTION_SHORT = "-h";
-	
-	private static final String HELP_OPTION_LONG = "--help";
-	
-	private static boolean displaySummary = false;
+	private static StandardOptions options;
 	
 	private enum State {
 		searchingException,
@@ -49,15 +38,11 @@ public class GrepEx {
 	
 	private static final List<ExceptionData> exceptions = new ArrayList<>();
 
-	public static void main(String[] args) throws IOException {
-		if (args.length > 0) {
-			if (args[0].equals(HELP_OPTION_LONG) || args[0].equals(HELP_OPTION_SHORT)) {
-				System.out.println(HELP);
-				return;
-			}
-			if (args[0].equals(SUMMARY_OPTION_LONG) || args[0].equals(SUMMARY_OPTION_SHORT)) {
-				displaySummary = true;
-			}
+	public static void main(String[] args) throws IOException, ParseException {
+		options = new StandardOptions(args);
+		if (options.isDisplayHelp()) {
+			options.printHelp();
+			return;
 		}
 		
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
@@ -71,7 +56,7 @@ public class GrepEx {
 		System.out.println(StandardOptions.SEPARATOR);
 		System.out.println("Summary:");
 		System.out.println(String.format("Found %s unique exception stacktraces in input stream.", exceptions.size()));
-		if (displaySummary) {
+		if (options.isDisplaySummary()) {
 			displaySummary();
 		}
 	}
@@ -102,7 +87,7 @@ public class GrepEx {
 					if (exceptionData == null) {
 						exceptionData = new ExceptionData(currentExceptionStacktrace, currentExceptionContext, currentExceptionLineNumber);
 						exceptions.add(exceptionData);
-						if (!displaySummary) {
+						if (!options.isDisplaySummary()) {
 							exceptionData.dump(false);
 						}
 					} else {
