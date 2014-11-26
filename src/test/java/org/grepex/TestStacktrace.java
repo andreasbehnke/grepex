@@ -11,20 +11,20 @@ public class TestStacktrace {
 
 	@Test
 	public void testAddLine() {
-		Stacktrace stacktrace = new Stacktrace(null);
-		stacktrace.addLine("top.level.exception.Exception: test");
-		stacktrace.addLine("\tthis.is.a.stack.trace.line");
-		stacktrace.addLine("   this.is.another.line");
-		stacktrace.addLine("root.cause.of.exception.Exception");
-		stacktrace.addLine("  just.another.line");
+		Stacktrace stacktrace = new Stacktrace(null, "Exception");
+		assertFalse(stacktrace.addLine("top.level.exception.Exception: test"));
+		assertTrue(stacktrace.addLine("\tthis.is.a.stack.trace.line"));
+		assertTrue(stacktrace.addLine("   this.is.another.line"));
+		assertTrue(stacktrace.addLine("Caused by: root.cause.of.exception.Exception"));
+		assertTrue(stacktrace.addLine("  just.another.line"));
 		
 		assertEquals(5, stacktrace.getLines().size());
 		assertEquals(2, stacktrace.getCauses().size());
-		assertEquals("top.level.exception.Exception: test", stacktrace.getLines().get(0));
-		assertEquals("top.level.exception.Exception: test", stacktrace.getCauses().get(0));
-		assertEquals("root.cause.of.exception.Exception", stacktrace.getLines().get(3));
-		assertEquals("root.cause.of.exception.Exception", stacktrace.getCauses().get(1));
-		assertEquals("  just.another.line", stacktrace.getLines().get(4));
+		assertEquals("Exception", stacktrace.getLines().get(0));
+		assertEquals("Exception", stacktrace.getCauses().get(0));
+		assertEquals("\tthis.is.a.stack.trace.line", stacktrace.getLines().get(1));
+		assertEquals("Caused by: root.cause.of.exception.Exception", stacktrace.getCauses().get(1));
+		assertEquals("Caused by: root.cause.of.exception.Exception", stacktrace.getLines().get(3));
 	}
 	
 	@Test
