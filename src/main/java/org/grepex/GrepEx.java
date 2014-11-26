@@ -71,7 +71,7 @@ public class GrepEx {
 					firstExceptionLines.append(System.lineSeparator()).append(contextLine);
 				}
 				currentExceptionContext = firstExceptionLines.toString();
-				currentExceptionStacktrace = new Stacktrace();
+				currentExceptionStacktrace = new Stacktrace(null); // TODO, use factory method create and make constructor private
 				state = State.processingException;
 			}
 			break;
