@@ -79,7 +79,7 @@ public class GrepEx {
 			if (line.length() > 0 && 
 					(Character.isWhitespace(line.charAt(0)) || line.startsWith("Caused by"))) {
 				// additional stacktrace line
-				currentExceptionStacktrace.getLines().add(line);
+				currentExceptionStacktrace.addLine(line);
 			} else {
 				// end of exception
 				if (!currentExceptionStacktrace.getLines().isEmpty()) {
