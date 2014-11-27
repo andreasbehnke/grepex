@@ -1,5 +1,6 @@
 package org.grepex;
 
+import java.io.ObjectInputStream.GetField;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
 import org.apache.commons.lang3.StringUtils;
 
 public class StandardOptions {
@@ -18,7 +20,7 @@ public class StandardOptions {
 	
 	public static final int MAX_WIDTH = 120;
 	
-	private static final String COMMAND_SYNTAX = "grepex [-s|--summary] [-h|--help]" + System.lineSeparator();
+	private static final String COMMAND_SYNTAX = "grepex [options|--help] [file1 file2 file3 ...]" + System.lineSeparator();
 	
 	private static final String HELP_OPT = "h";
 	
@@ -34,22 +36,23 @@ public class StandardOptions {
 
 	private static final Options OPTIONS = new Options().addOption(HELP).addOption(SUMMARY).addOption(EXCLUDE);
 	
-	private final CommandLine cl;
-	
 	private final boolean displayHelp;
 	
 	private final boolean displaySummary;
 	
 	private final List<String> excludes;
 	
+	private final List<String> inputFileNames;
+	
 	public StandardOptions(String[] args) throws ParseException {
-		this.cl = new GnuParser().parse(OPTIONS, args);
+		CommandLine cl = new GnuParser().parse(OPTIONS, args);
 		this.displayHelp = cl.hasOption(HELP_OPT);
 		this.displaySummary = cl.hasOption(SUMMARY_OPT);
-		this.excludes = getOptionList(EXCLUDE_OPT);
+		this.excludes = getOptionList(cl, EXCLUDE_OPT);
+		this.inputFileNames = cl.getArgList(); 
 	}
 	
-	private List<String> getOptionList(String opt) {
+	private List<String> getOptionList(CommandLine cl, String opt) {
 		String listString = cl.getOptionValue(opt);
 		if (listString != null) {
 			return Arrays.asList(StringUtils.split(listString, ','));
@@ -68,6 +71,10 @@ public class StandardOptions {
 	
 	public List<String> getExcludes() {
 		return excludes;
+	}
+
+	public List<String> getInputFileNames() {
+		return inputFileNames;
 	}
 	
 	public void printHelp() {

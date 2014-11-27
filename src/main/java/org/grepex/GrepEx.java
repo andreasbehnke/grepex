@@ -1,10 +1,16 @@
 package org.grepex;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.SequenceInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
@@ -26,7 +32,7 @@ public class GrepEx {
 			return;
 		}
 		
-		ExceptionParser parser = new ExceptionParser(new InputStreamReader(System.in), CONTEXT_LINE_COUNT, options.getExcludes());
+		ExceptionParser parser = new ExceptionParser(openInput(), CONTEXT_LINE_COUNT, options.getExcludes());
 		Stacktrace stacktrace;
 		while((stacktrace = parser.next()) != null) {
 			ExceptionData exceptionData = findMatchingException(stacktrace);
@@ -48,6 +54,35 @@ public class GrepEx {
 		if (options.isDisplaySummary()) {
 			displaySummary();
 		}
+	}
+	
+	private static Reader openInput() throws FileNotFoundException {
+		InputStream input = null;
+		if (options.getInputFileNames().size() > 0) {
+			final List<String> fileStack = new ArrayList<>(options.getInputFileNames());
+			input = new SequenceInputStream(new Enumeration<InputStream>() {
+
+				@Override
+				public boolean hasMoreElements() {
+					return !fileStack.isEmpty();
+				}
+
+				@Override
+				public InputStream nextElement() {
+					try {
+						String fileName = fileStack.remove(0);
+						System.out.println("\nReading file " + fileName + " ...\n");
+						return new FileInputStream(fileName);
+					} catch (FileNotFoundException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				
+			});
+		} else {
+			input = System.in;
+		}
+		return new InputStreamReader(input);
 	}
 	
 	private static ExceptionData findMatchingException(Stacktrace currentStacktrace) {
