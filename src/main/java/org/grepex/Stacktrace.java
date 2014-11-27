@@ -52,7 +52,7 @@ public class Stacktrace {
 			if (contextSize > 2) {
 				// if line before whitespace contains word 'Exception', than we have hit an exception stacktrace
 				String exception = context.get(contextSize -2);
-				if (exception.contains(EXCEPTION_INDICATOR)) {
+				if (!startsWithWhitespace(exception) && exception.contains(EXCEPTION_INDICATOR)) {
 					Stacktrace stacktrace = new Stacktrace(context.subList(0, contextSize - 2), exception, currentLineNumber - 2);
 					stacktrace.addLine(context.get(contextSize - 2));
 					stacktrace.addLine(context.get(contextSize - 1));
