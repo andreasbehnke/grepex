@@ -26,7 +26,7 @@ public class GrepEx {
 			return;
 		}
 		
-		ExceptionParser parser = new ExceptionParser(new InputStreamReader(System.in), CONTEXT_LINE_COUNT);
+		ExceptionParser parser = new ExceptionParser(new InputStreamReader(System.in), CONTEXT_LINE_COUNT, options.getExcludes());
 		Stacktrace stacktrace;
 		while((stacktrace = parser.next()) != null) {
 			ExceptionData exceptionData = findMatchingException(stacktrace);

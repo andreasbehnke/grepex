@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -42,7 +43,7 @@ public class TestExceptionParser {
 				+ "      at abc\n"
 				+ "gsdfg\n"
 				+ "sdfgdfg\n");
-		ExceptionParser parser = new ExceptionParser(input, 5);
+		ExceptionParser parser = new ExceptionParser(input, 5, Collections.EMPTY_LIST);
 		Stacktrace stack1 = parser.next();
 		Stacktrace stack2 = parser.next();
 		assertNull(parser.next());
