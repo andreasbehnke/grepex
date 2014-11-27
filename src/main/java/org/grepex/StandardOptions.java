@@ -9,7 +9,7 @@ import org.apache.commons.cli.ParseException;
 
 public class StandardOptions {
 	
-	public static final String SEPARATOR = red("------");
+	public static final String SEPARATOR = "\n------\n";
 	
 	public static final int MAX_WIDTH = 120;
 	
@@ -43,9 +43,5 @@ public class StandardOptions {
 		HelpFormatter helpFormatter = new HelpFormatter();
 		helpFormatter.setWidth(MAX_WIDTH);
 		helpFormatter.printHelp(COMMAND_SYNTAX, "", OPTIONS, "");
-	}
-	
-	public static String red(String text) {
-		return (char)27 + "[31m" + text + (char)27 + "[0m";
 	}
 }
