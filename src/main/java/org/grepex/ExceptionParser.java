@@ -41,7 +41,7 @@ public class ExceptionParser {
 		Stacktrace stacktrace = null;
 		switch (state) {
 		case searchingException:
-			currentStacktrace = Stacktrace.findStacktraceStart(line, lineBuffer);
+			currentStacktrace = Stacktrace.findStacktraceStart(line, input.getLineNumber(), lineBuffer);
 			if (currentStacktrace != null) {
 				state = State.processingException;
 			}

@@ -11,7 +11,7 @@ public class TestStacktrace {
 
 	@Test
 	public void testAddLine() {
-		Stacktrace stacktrace = new Stacktrace(null, "Exception");
+		Stacktrace stacktrace = new Stacktrace(null, "Exception", -1);
 		assertFalse(stacktrace.addLine("top.level.exception.Exception: test"));
 		assertTrue(stacktrace.addLine("\tthis.is.a.stack.trace.line"));
 		assertTrue(stacktrace.addLine("   this.is.another.line"));
@@ -36,7 +36,7 @@ public class TestStacktrace {
 		context.add("this.is.an.Exception");
 		String lastLine = "\tfirst.trace.line";
 		context.add(lastLine);
-		Stacktrace stacktrace = Stacktrace.findStacktraceStart(lastLine, context);
+		Stacktrace stacktrace = Stacktrace.findStacktraceStart(lastLine, 4, context);
 		
 		assertNotNull(stacktrace);
 		assertEquals(3, stacktrace.getContext().size());
@@ -59,7 +59,7 @@ public class TestStacktrace {
 		context.add("this.is.NOT");
 		String lastLine = "\tfirst.trace.line";
 		context.add(lastLine);
-		Stacktrace stacktrace = Stacktrace.findStacktraceStart(lastLine, context);
+		Stacktrace stacktrace = Stacktrace.findStacktraceStart(lastLine, 4, context);
 		
 		assertNull(stacktrace);
 		
@@ -68,7 +68,7 @@ public class TestStacktrace {
 		context.add("Log line 2");
 		context.add("Log line 3");
 		context.add("this.is.NOT");
-		stacktrace = Stacktrace.findStacktraceStart(lastLine, context);
+		stacktrace = Stacktrace.findStacktraceStart(lastLine, 4, context);
 		
 		assertNull(stacktrace);
 	}

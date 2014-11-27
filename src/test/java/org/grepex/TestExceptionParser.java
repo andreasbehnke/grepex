@@ -43,13 +43,20 @@ public class TestExceptionParser {
 				+ "gsdfg\n"
 				+ "sdfgdfg\n");
 		ExceptionParser parser = new ExceptionParser(input, 5);
-		Stacktrace stack = parser.next();
-		assertNotNull(parser.next());
+		Stacktrace stack1 = parser.next();
+		Stacktrace stack2 = parser.next();
 		assertNull(parser.next());
-		assertNotNull(stack);
-		assertEquals(5, stack.getContext().size());
-		assertEquals("sadfdsfdsfdsf", stack.getContext().get(0));
-		assertEquals("sadfdsfdsf", stack.getContext().get(4));
 		
+		assertNotNull(stack1);
+		assertEquals(5, stack1.getContext().size());
+		assertEquals(6, stack1.getLineNumber());
+		assertEquals("sadfdsfdsfdsf", stack1.getContext().get(0));
+		assertEquals("sadfdsfdsf", stack1.getContext().get(4));
+		
+		assertNotNull(stack2);
+		assertEquals(5, stack2.getContext().size());
+		assertEquals(21, stack2.getLineNumber());
+		assertEquals("sadfsda", stack2.getContext().get(0));
+		assertEquals("afdsfs", stack2.getContext().get(4));	
 	}
 }
