@@ -13,16 +13,16 @@ public class TestStacktrace {
 	public void testAddLine() {
 		Stacktrace stacktrace = new Stacktrace(null, "Exception", -1);
 		assertFalse(stacktrace.addLine("top.level.exception.Exception: test"));
-		assertTrue(stacktrace.addLine("\tthis.is.a.stack.trace.line"));
-		assertTrue(stacktrace.addLine("   this.is.another.line"));
+		assertTrue(stacktrace.addLine("\tat this.is.a.stack.trace.line"));
+		assertTrue(stacktrace.addLine("   at this.is.another.line"));
 		assertTrue(stacktrace.addLine("Caused by: root.cause.of.exception.Exception"));
-		assertTrue(stacktrace.addLine("  just.another.line"));
+		assertTrue(stacktrace.addLine("  at just.another.line"));
 		
 		assertEquals(5, stacktrace.getLines().size());
 		assertEquals(2, stacktrace.getCauses().size());
 		assertEquals("Exception", stacktrace.getLines().get(0));
 		assertEquals("Exception", stacktrace.getCauses().get(0));
-		assertEquals("\tthis.is.a.stack.trace.line", stacktrace.getLines().get(1));
+		assertEquals("\tat this.is.a.stack.trace.line", stacktrace.getLines().get(1));
 		assertEquals("Caused by: root.cause.of.exception.Exception", stacktrace.getCauses().get(1));
 		assertEquals("Caused by: root.cause.of.exception.Exception", stacktrace.getLines().get(3));
 	}
@@ -34,7 +34,7 @@ public class TestStacktrace {
 		context.add("Log line 2");
 		context.add("Log line 3");
 		context.add("this.is.an.Exception");
-		String lastLine = "\tfirst.trace.line";
+		String lastLine = "\tat first.trace.line";
 		context.add(lastLine);
 		Stacktrace stacktrace = Stacktrace.findStacktraceStart(lastLine, 4, context);
 		
@@ -47,7 +47,7 @@ public class TestStacktrace {
 		assertEquals("this.is.an.Exception", stacktrace.getCauses().get(0));
 		assertEquals(2, stacktrace.getLines().size());
 		assertEquals("this.is.an.Exception", stacktrace.getLines().get(0));
-		assertEquals("\tfirst.trace.line", stacktrace.getLines().get(1));
+		assertEquals("\tat first.trace.line", stacktrace.getLines().get(1));
 	}
 	
 	@Test
@@ -57,7 +57,7 @@ public class TestStacktrace {
 		context.add("Log line 2");
 		context.add("Log line 3");
 		context.add("this.is.NOT");
-		String lastLine = "\tfirst.trace.line";
+		String lastLine = "\tat first.trace.line";
 		context.add(lastLine);
 		Stacktrace stacktrace = Stacktrace.findStacktraceStart(lastLine, 4, context);
 		

@@ -1,5 +1,7 @@
 package org.grepex;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ExceptionData {
 
 	private final Stacktrace stacktrace;
@@ -10,10 +12,10 @@ public class ExceptionData {
 	                                   
 	private int numberOfOccurrence;
 
-	public ExceptionData(Stacktrace stacktrace, String contextLogs, int lineNumberOfFirstOccurrence) {
+	public ExceptionData(Stacktrace stacktrace) {
 		this.stacktrace = stacktrace;
-		this.contextLogs = contextLogs;
-		this.lineNumberOfFirstOccurrence = lineNumberOfFirstOccurrence;
+		this.contextLogs = StringUtils.join(stacktrace.getContext(), '\n');
+		this.lineNumberOfFirstOccurrence = stacktrace.getLineNumber();
 		this.numberOfOccurrence = 1;
 	}
 

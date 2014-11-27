@@ -67,9 +67,9 @@ public class Stacktrace {
 	// internal API, only used by exception parser
 	boolean addLine(String line) {
 		boolean lineAdded = false;
-		boolean startsWithWhitespace = startsWithWhitespace(line);
+		boolean startsWithAt = line.trim().startsWith("at");
 		boolean isCause = (line != null && line.startsWith("Caused by"));
-		if (startsWithWhitespace || isCause) {
+		if (startsWithAt || isCause) {
 			lines.add(line);
 			if (isCause) {
 				causes.add(line);
