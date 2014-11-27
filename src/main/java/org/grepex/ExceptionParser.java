@@ -5,6 +5,7 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
+import org.apache.commons.lang3.StringUtils;
 
 public class ExceptionParser {
 
@@ -31,8 +32,10 @@ public class ExceptionParser {
 		String line;
 		Stacktrace stacktrace = null;
 		while (stacktrace == null && (line = input.readLine()) != null) {
-			lineBuffer.add(line);
-			stacktrace = processLine(line);
+			if (!StringUtils.isEmpty(line)) {
+				lineBuffer.add(line);
+				stacktrace = processLine(line);
+			}
 		}
 		return stacktrace;
 	}
