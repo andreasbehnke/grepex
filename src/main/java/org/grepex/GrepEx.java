@@ -86,6 +86,7 @@ public class GrepEx {
 	}
 	
 	private static ExceptionData findMatchingException(Stacktrace currentStacktrace) {
+		ExceptionData matchedException = null;
 		for (ExceptionData exceptionData : exceptions) {
 			boolean match = false;
 			Stacktrace stacktrace = exceptionData.getStacktrace();
@@ -106,10 +107,11 @@ public class GrepEx {
 				}
 			}
 			if (match) {
-				return exceptionData;
+				matchedException = exceptionData;
+				break;
 			}
 		}
-		return null;
+		return matchedException;
 	}
 	
 	private static void displaySummary() {
