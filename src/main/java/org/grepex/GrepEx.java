@@ -17,8 +17,6 @@ import org.apache.commons.cli.ParseException;
 
 public class GrepEx {
 
-	private static final int CONTEXT_LINE_COUNT = 10;
-	
 	private static final int DIFFERENT_STACKTRACE_LINES_THRESHOLD = 3;
 	
 	private static StandardOptions options;
@@ -32,7 +30,7 @@ public class GrepEx {
 			return;
 		}
 		
-		ExceptionParser parser = new ExceptionParser(openInput(), CONTEXT_LINE_COUNT, options.getExcludes());
+		ExceptionParser parser = new ExceptionParser(openInput(), options);
 		Stacktrace stacktrace;
 		while((stacktrace = parser.next()) != null) {
 			ExceptionData exceptionData = findMatchingException(stacktrace);

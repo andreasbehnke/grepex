@@ -15,7 +15,7 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.lang3.StringUtils;
 
 public class StandardOptions {
-	
+
 	public static final String SEPARATOR = "\n------\n";
 	
 	public static final int MAX_WIDTH = 120;
@@ -34,13 +34,25 @@ public class StandardOptions {
 	
 	private static final Option EXCLUDE = new Option(EXCLUDE_OPT, "exclude", true, "Comma separated list of excludes for exception namespaces");
 
-	private static final Options OPTIONS = new Options().addOption(HELP).addOption(SUMMARY).addOption(EXCLUDE);
-	
+	private static final String INCLUDE_OPT = "i";
+
+	private static final Option INCLUDE = new Option(INCLUDE_OPT, "include", true, "Comma separated list of includes for exception namespaces");
+
+	private static final Options OPTIONS = new Options()
+			.addOption(HELP)
+			.addOption(SUMMARY)
+			.addOption(EXCLUDE)
+			.addOption(INCLUDE);
+
+	private static final int CONTEXT_LINE_COUNT = 10;
+
 	private final boolean displayHelp;
 	
 	private final boolean displaySummary;
 	
 	private final List<String> excludes;
+
+	private final List<String> includes;
 	
 	private final List<String> inputFileNames;
 	
@@ -49,6 +61,7 @@ public class StandardOptions {
 		this.displayHelp = cl.hasOption(HELP_OPT);
 		this.displaySummary = cl.hasOption(SUMMARY_OPT);
 		this.excludes = getOptionList(cl, EXCLUDE_OPT);
+		this.includes = getOptionList(cl, INCLUDE_OPT);
 		this.inputFileNames = cl.getArgList(); 
 	}
 	
@@ -61,6 +74,8 @@ public class StandardOptions {
 		}
 	}
 
+	public int getContextLineCount() { return CONTEXT_LINE_COUNT; }
+
 	public boolean isDisplaySummary() {
 		return displaySummary;
 	}
@@ -68,7 +83,9 @@ public class StandardOptions {
 	public boolean isDisplayHelp() {
 		return displayHelp;
 	}
-	
+
+	public List<String> getIncludes() { return includes; }
+
 	public List<String> getExcludes() {
 		return excludes;
 	}

@@ -24,10 +24,20 @@ public class ExceptionParser {
 	private Stacktrace currentStacktrace = null;
 	
 	private final List<String> excludes;
-	
-	public ExceptionParser(Reader in, int contextLength, List<String> excludes) {
+
+	private final List<String> includes;
+
+	public ExceptionParser(Reader in, StandardOptions options) {
 		input = new LineNumberReader(in);
-		lineBuffer = new CircularFifoBuffer(contextLength + 2);
+		lineBuffer = new CircularFifoBuffer(options.getContextLineCount() + 2);
+		this.includes = options.getIncludes();
+		this.excludes = options.getExcludes();
+	}
+
+	protected ExceptionParser(Reader in, int contextLineCount, List<String> includes, List<String> excludes) {
+		input = new LineNumberReader(in);
+		lineBuffer = new CircularFifoBuffer(contextLineCount + 2);
+		this.includes = includes;
 		this.excludes = excludes;
 	}
 	
@@ -69,16 +79,34 @@ public class ExceptionParser {
 	}
 	
 	private boolean match(Stacktrace stacktrace) {
-		boolean match = true;
-		for (String exclude : excludes) {
-			for (String exception : stacktrace.getCauses()) {
-				if (exception.contains(exclude)) {
-					match = false;
+		boolean match = false;
+		boolean isIncluded = true;
+		if (includes.size() > 0) {
+			isIncluded = false;
+			for (String include : includes) {
+				for (String exception : stacktrace.getCauses()) {
+					if (exception.contains(include)) {
+						isIncluded = true;
+						break;
+					}
+				}
+				if (isIncluded) {
 					break;
 				}
 			}
-			if (!match) {
-				break;
+		}
+		if (isIncluded) {
+			match = true;
+			for (String exclude : excludes) {
+				for (String exception : stacktrace.getCauses()) {
+					if (exception.contains(exclude)) {
+						match = false;
+						break;
+					}
+				}
+				if (!match) {
+					break;
+				}
 			}
 		}
 		return match;
