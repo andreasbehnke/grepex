@@ -68,8 +68,9 @@ public class Stacktrace {
 	boolean addLine(String line) {
 		boolean lineAdded = false;
 		boolean startsWithAt = line.trim().startsWith("at");
-		boolean isCause = (line != null && line.startsWith("Caused by"));
-		if (startsWithAt || isCause) {
+		boolean isCause = line.trim().startsWith("Caused by");
+		boolean isMore = line.trim().startsWith("...");
+		if (startsWithAt || isCause || isMore) {
 			lines.add(line);
 			if (isCause) {
 				causes.add(line);
